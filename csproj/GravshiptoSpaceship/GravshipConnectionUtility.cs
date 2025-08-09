@@ -386,7 +386,7 @@ public static class GravshipConnectionUtility
 			if (ticksGame - value.Item2 <= 60)
 			{
 				VanillaStructureCacheSmart[key] = (value.Item1, ticksGame);
-				if (GravshipLogger.EnableLogging)
+				if (GravshipLogger.ShouldLog)
 				{
 					Log.Warning($"[Gravship DEBUG] VanillaStructure cache hit for {root.def.defName} at {root.Position}, count={value.Item1.Count}");
 				}
@@ -397,7 +397,7 @@ public static class GravshipConnectionUtility
 		List<List<Building>> allVanillaStructuresCached = GetAllVanillaStructuresCached(map);
 		List<Building> list = allVanillaStructuresCached.FirstOrDefault((List<Building> group) => group.Contains(root)) ?? new List<Building>();
 		VanillaStructureCacheSmart[key] = (list, ticksGame);
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Warning($"[Gravship DEBUG] VanillaStructure resolved for {root.def.defName} at {root.Position}, count={list.Count}");
 			foreach (Building item in list)
@@ -528,7 +528,7 @@ public static class GravshipConnectionUtility
 			if (ticksGame - value.Item2 <= 60)
 			{
 				GravshipStructureCacheSmart[uniqueID] = (value.Item1, ticksGame);
-				if (GravshipLogger.EnableLogging)
+				if (GravshipLogger.ShouldLog)
 				{
 					Log.Warning($"[Gravship DEBUG] GravshipStructure cache hit for map {map.Index}, structure count = {value.Item1.Count}");
 				}
@@ -538,7 +538,7 @@ public static class GravshipConnectionUtility
 		}
 		List<List<Building>> allGravshipStructures = GetAllGravshipStructures(map);
 		GravshipStructureCacheSmart[uniqueID] = (allGravshipStructures, ticksGame);
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Warning($"[Gravship DEBUG] GravshipStructure recalculated for map {map.Index}, structure count = {allGravshipStructures.Count}");
 			int num = 0;
@@ -581,7 +581,7 @@ public static class GravshipConnectionUtility
 			});
 			VanillaStructuresCacheSmart.Remove(uniqueID);
 			GravshipStructureCacheSmart.Remove(uniqueID);
-			if (GravshipLogger.EnableLogging)
+			if (GravshipLogger.ShouldLog)
 			{
 				Log.Warning($"[Gravship DEBUG] All ship-related caches cleared for map {map.Index}");
 			}

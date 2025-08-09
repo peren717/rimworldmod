@@ -44,9 +44,9 @@ public class GravshiptoSpaceshipMod : Mod
 				Dictionary<Map, Area> dictionary2 = new Dictionary<Map, Area>();
 				foreach (KeyValuePair<Map, Area> item2 in dictionary)
 				{
-					if ((item2.Key == null || item2.Value == null) && GravshipLogger.EnableLogging)
+					if ((item2.Key == null || item2.Value == null) && GravshipLogger.ShouldLog)
 					{
-						Log.Warning($"[Gravship DEBUG] セーブ前全体クリーン: Pawn={item.LabelShortCap} ({item.ThingID}) に不正な allowedAreas エントリ → key={item2.Key}, val={item2.Value}");
+						Log.Warning($"[Gravship DEBUG] セーブ前全体クリーン: Pawn={item.LabelShortCap} ({item.ThingID}) に不正な allowedAreas エントリ �?key={item2.Key}, val={item2.Value}");
 					}
 					if (item2.Key != null && maps.Contains(item2.Key) && item2.Value != null && item2.Key.areaManager.AllAreas.Contains(item2.Value))
 					{
@@ -207,11 +207,11 @@ public class GravshiptoSpaceshipMod : Mod
 				}
 				foreach (KeyValuePair<Map, Area> item in dictionary)
 				{
-					if (item.Key == null && GravshipLogger.EnableLogging)
+					if (item.Key == null && GravshipLogger.ShouldLog)
 					{
 						Log.Warning("[Gravship DEBUG] null Map key in allowedAreas for Pawn=" + pawn.LabelShortCap + " (" + pawn.ThingID + ")");
 					}
-					if (item.Value == null && GravshipLogger.EnableLogging)
+					if (item.Value == null && GravshipLogger.ShouldLog)
 					{
 						Log.Warning("[Gravship DEBUG] null Area value in allowedAreas for Pawn=" + pawn.LabelShortCap + " (" + pawn.ThingID + ")");
 					}

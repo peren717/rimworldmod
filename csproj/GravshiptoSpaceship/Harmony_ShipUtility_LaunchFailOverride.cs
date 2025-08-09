@@ -25,7 +25,7 @@ public static class Harmony_ShipUtility_LaunchFailOverride
 		if (flag)
 		{
 			__result = list;
-			if (GravshipLogger.EnableLogging)
+			if (GravshipLogger.ShouldLog)
 			{
 				Log.Warning($"[Gravship DEBUG] root={rootBuilding.def.defName} at {rootBuilding.Position} isVanilla={flag}, count={list2.Count}");
 			}
@@ -42,13 +42,13 @@ public static class Harmony_ShipUtility_LaunchFailOverride
 			{
 				return;
 			}
-			if (GravshipLogger.EnableLogging)
+			if (GravshipLogger.ShouldLog)
 			{
 				Log.Warning($"[Gravship DEBUG] isVanilla={flag} for root={rootBuilding.def.defName} at {rootBuilding.Position}");
 			}
 			if (!flag)
 			{
-				if (GravshipLogger.EnableLogging)
+				if (GravshipLogger.ShouldLog)
 				{
 					Log.Warning("[Gravship DEBUG] Structure treated as Gravship");
 				}
@@ -56,7 +56,7 @@ public static class Harmony_ShipUtility_LaunchFailOverride
 				{
 					foreach (Building item in list3)
 					{
-						if (GravshipLogger.EnableLogging)
+						if (GravshipLogger.ShouldLog)
 						{
 							Log.Warning($"  [GravPart] {item.def.defName} at {item.Position}");
 						}
@@ -74,7 +74,7 @@ public static class Harmony_ShipUtility_LaunchFailOverride
 				string label = ThingDefOf.Ship_Engine.label;
 				list.Add("ShipReportMissingPart".Translate() + ": " + $"{num2}x {label} " + string.Format("({0} {1})", "ShipReportMissingPartRequires".Translate(), 3));
 			}
-			if (GravshipLogger.EnableLogging)
+			if (GravshipLogger.ShouldLog)
 			{
 				Log.Warning($"[Gravship DEBUG] Active nuclear engines (CanBeActive==true) = {num}");
 			}

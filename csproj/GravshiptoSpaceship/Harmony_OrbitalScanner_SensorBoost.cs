@@ -28,7 +28,7 @@ public static class Harmony_OrbitalScanner_SensorBoost
 			return original;
 		}
 		int num = original / 2;
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Message("[Gravship] Sensor cluster detected: scan time reduced from " + original.ToStringTicksToPeriod() + " to " + num.ToStringTicksToPeriod() + ".");
 		}

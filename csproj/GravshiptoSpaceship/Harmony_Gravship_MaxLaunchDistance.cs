@@ -20,7 +20,7 @@ public static class Harmony_Gravship_MaxLaunchDistance
 			return true;
 		}
 		GravshipConnectionUtility.GravshipStatus gravshipStatus = GravshipConnectionUtility.EvaluateGravshipStatusCached(map, intVec.Value);
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Message($"[Gravship] MaxLaunchDistance check for {__instance.LabelCap} at {__instance.Position}");
 			Log.Message($"[Gravship] Status: Reactor={gravshipStatus.HasReactor}, NuclearEngine={gravshipStatus.HasNuclearEngine}, Thruster={gravshipStatus.HasFunctionalThruster}");

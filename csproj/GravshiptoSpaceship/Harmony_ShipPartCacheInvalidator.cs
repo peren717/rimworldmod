@@ -48,7 +48,7 @@ public static class Harmony_ShipPartCacheInvalidator
 
 	private static void InvalidateCaches(Map map)
 	{
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Warning($"[Gravship DEBUG] Invalidating all ship-related caches for map {map.Index}");
 		}

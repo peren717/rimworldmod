@@ -28,7 +28,7 @@ public static class Harmony_GravshipUtility_PreLaunchConfirmation
 		{
 			GravshipLaunchContext.LastUsedConsoleMap = console.parent.Map;
 			GravshipLaunchContext.LastUsedConsolePos = console.parent.Position;
-			if (GravshipLogger.EnableLogging)
+			if (GravshipLogger.ShouldLog)
 			{
 				Log.Message($"[Gravship] GravshipLaunchContext 更新: {console.parent.Position}");
 			}

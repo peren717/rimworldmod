@@ -59,19 +59,19 @@ public static class Harmony_BuildingGravEngine_ConsumeFuel
 		float quality = __instance.launchInfo.quality;
 		float num2 = Mathf.Clamp01(quality + num);
 		__instance.launchInfo.quality = num2;
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Message($"[Gravship] Quality calculation for engine {__instance.LabelCap} at {__instance.Position}");
 		}
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Message($"[Gravship] Connected parts (deduplicated): {hashSet.Count}, Core={flag}, Sensor={flag2}, Bonus={num}, ThingID={__instance.ThingID}");
 		}
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Message($"[Gravship] Previous quality = {quality}");
 		}
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Message($"[Gravship] Final quality for {__instance.LabelCap} = {num2}");
 		}

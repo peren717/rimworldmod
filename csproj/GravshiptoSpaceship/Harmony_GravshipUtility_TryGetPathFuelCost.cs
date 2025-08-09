@@ -15,7 +15,7 @@ public static class Harmony_GravshipUtility_TryGetPathFuelCost
 		distance = 0;
 		if (GravshipLaunchContext.LastUsedConsoleMap == null || !GravshipLaunchContext.LastUsedConsolePos.HasValue)
 		{
-			if (GravshipLogger.EnableLogging)
+			if (GravshipLogger.ShouldLog)
 			{
 				Log.Warning("[Gravship] GravshipLaunchContext 情報が不明（map/pos null）");
 			}
@@ -35,7 +35,7 @@ public static class Harmony_GravshipUtility_TryGetPathFuelCost
 			return true;
 		}
 		GravshipConnectionUtility.GravshipStatus gravshipStatus = GravshipConnectionUtility.EvaluateGravshipStatusCached(lastUsedConsoleMap, intVec.Value);
-		if (GravshipLogger.EnableLogging)
+		if (GravshipLogger.ShouldLog)
 		{
 			Log.Message($"[Gravship] TryGetPathFuelCost: Reactor={gravshipStatus.HasReactor}, NuclearEngine={gravshipStatus.HasNuclearEngine}, Thruster={gravshipStatus.HasFunctionalThruster}");
 		}
