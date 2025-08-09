@@ -187,12 +187,30 @@ public class GravshipRestorer : GameComponent
 				}
 			}
 			
-			// 清理飞船区域 - 彻底清除所有阻挡物
-			Log.Message($"[Gravship] 开始彻底清理飞船区域，共 {shipCells.Count} 个格子");
+			// 计算飞船周围3格范围内的所有格子
+			HashSet<IntVec3> clearanceCells = new HashSet<IntVec3>();
+			foreach (IntVec3 shipCell in shipCells)
+			{
+				// 为每个飞船格子添加周围3格范围
+				for (int x = -3; x <= 3; x++)
+				{
+					for (int z = -3; z <= 3; z++)
+					{
+						IntVec3 clearanceCell = shipCell + new IntVec3(x, 0, z);
+						if (clearanceCell.InBounds(map))
+						{
+							clearanceCells.Add(clearanceCell);
+						}
+					}
+				}
+			}
+			
+			// 清理飞船周围3格范围 - 强制清除所有非Pawn物体
+			Log.Message($"[Gravship] 开始清理飞船周围3格范围，飞船占用 {shipCells.Count} 个格子，清理范围 {clearanceCells.Count} 个格子");
 			int clearedThings = 0;
 			try
 			{
-				foreach (IntVec3 cell in shipCells)
+				foreach (IntVec3 cell in clearanceCells)
 				{
 					if (cell.InBounds(map))
 					{
@@ -202,80 +220,72 @@ public class GravshipRestorer : GameComponent
 						{
 							Thing thing = thingsAtCell[i];
 							
-							// 保留小人
+							// 只保留小人，其他所有东西都强制清除
 							if (thing is Pawn)
 							{
 								continue;
 							}
 							
-							// 强制清除所有非小人物体，包括：
-							// - 建筑物 (Buildings)
-							// - 植物 (Plants) 
-							// - 岩石和矿物 (Mineable)
-							// - 热喷泉 (Geyser)
-							// - 物品 (Items)
-							// - 碎片 (Filth)
-							// - 地图特征 (Natural)
-							// - 任何其他物体
-							bool shouldDestroy = true; // 默认清除所有非小人物体
-							
-							// 只有小人不清除，其他所有东西都清除
-							if (thing is Pawn)
+							try
 							{
-								shouldDestroy = false;
-							}
-							
-							if (shouldDestroy)
-							{
-								try
+								Log.Message($"[Gravship] 强制清除: {thing.def.defName} (类别: {thing.def.category}) at {cell}");
+								
+								// 使用最强力的清除方法 - 不管是什么物体都要清除
+								bool destroyed = false;
+								
+								// 方法1：尝试Destroy
+								if (!destroyed)
 								{
-									Log.Message($"[Gravship] 强制清除: {thing.def.defName} (类别: {thing.def.category}) at {cell}");
-									
-									// 对于特殊物体使用不同的清除方式
-									if (thing.def.defName.Contains("Geyser") || thing.def.defName.Contains("geyser"))
-									{
-										// 热喷泉特殊处理
-										Log.Message($"[Gravship] 检测到热喷泉，强制移除: {thing.def.defName}");
-									}
-									
-									// 强制销毁，不管是否可销毁
-									if (thing.def.destroyable)
+									try
 									{
 										thing.Destroy(DestroyMode.Vanish);
+										destroyed = true;
+										Log.Message($"[Gravship] 通过Destroy成功清除: {thing.def.defName}");
 									}
-									else
+									catch (Exception ex1)
 									{
-										// 对于不可销毁的物体，尝试直接从地图移除
-										try
-										{
-											thing.DeSpawn(DestroyMode.Vanish);
-											Log.Message($"[Gravship] 通过DeSpawn移除不可销毁物体: {thing.def.defName}");
-										}
-										catch
-										{
-											// 最后手段：直接从thingGrid移除
-											map.thingGrid.Deregister(thing);
-											Log.Message($"[Gravship] 通过thingGrid.Deregister强制移除: {thing.def.defName}");
-										}
+										Log.Warning($"[Gravship] Destroy失败: {thing.def.defName} - {ex1.Message}");
 									}
-									
-									clearedThings++;
 								}
-								catch (Exception destroyEx)
+								
+								// 方法2：尝试DeSpawn
+								if (!destroyed)
 								{
-									Log.Warning($"[Gravship] 无法清除 {thing.def.defName}: {destroyEx.Message}");
-									// 尝试备用清除方法
+									try
+									{
+										thing.DeSpawn(DestroyMode.Vanish);
+										destroyed = true;
+										Log.Message($"[Gravship] 通过DeSpawn成功清除: {thing.def.defName}");
+									}
+									catch (Exception ex2)
+									{
+										Log.Warning($"[Gravship] DeSpawn失败: {thing.def.defName} - {ex2.Message}");
+									}
+								}
+								
+								// 方法3：强制从thingGrid移除
+								if (!destroyed)
+								{
 									try
 									{
 										map.thingGrid.Deregister(thing);
-										Log.Message($"[Gravship] 使用备用方法成功移除: {thing.def.defName}");
-										clearedThings++;
+										destroyed = true;
+										Log.Message($"[Gravship] 通过thingGrid.Deregister强制清除: {thing.def.defName}");
 									}
-									catch (Exception backupEx)
+									catch (Exception ex3)
 									{
-										Log.Error($"[Gravship] 备用清除方法也失败: {thing.def.defName} - {backupEx.Message}");
+										Log.Error($"[Gravship] 所有清除方法都失败: {thing.def.defName} - {ex3.Message}");
 									}
 								}
+								
+								if (destroyed)
+								{
+									clearedThings++;
+								}
+							}
+							catch (Exception destroyEx)
+							{
+								Log.Error($"[Gravship] 清除物体时发生未知错误: {thing.def.defName} - {destroyEx.Message}");
 							}
 						}
 						
@@ -313,6 +323,7 @@ public class GravshipRestorer : GameComponent
 								currentTerrain.dangerous ||
 								currentTerrain.defName.Contains("Rock") ||
 								currentTerrain.defName.Contains("Wall") ||
+								currentTerrain.defName.Contains("Mountain") ||
 								currentTerrain.defName.Contains("Geyser") ||
 								currentTerrain.defName.Contains("geyser") ||
 								currentTerrain.defName.Contains("Steam") ||
@@ -356,24 +367,88 @@ public class GravshipRestorer : GameComponent
 						{
 							if (!(remaining is Pawn))
 							{
-								Log.Warning($"[Gravship] 发现残留物体，再次尝试清除: {remaining.def.defName} at {cell}");
+								Log.Warning($"[Gravship] 发现残留物体，使用终极清除方法: {remaining.def.defName} at {cell}");
+								
 								try
 								{
+									// 终极清除方法：强制从所有系统中移除
+									if (remaining.Spawned)
+									{
+										remaining.DeSpawn(DestroyMode.Vanish);
+									}
 									map.thingGrid.Deregister(remaining);
+									
+									// 强制设置该位置为可通行地形
+									map.terrainGrid.SetTerrain(cell, TerrainDefOf.Soil);
+									
+									Log.Message($"[Gravship] 终极清除成功: {remaining.def.defName}");
 								}
 								catch (Exception finalEx)
 								{
-									Log.Error($"[Gravship] 最终清除失败: {remaining.def.defName} - {finalEx.Message}");
+									Log.Error($"[Gravship] 终极清除也失败: {remaining.def.defName} - {finalEx.Message}");
 								}
 							}
 						}
 					}
 				}
-				Log.Message($"[Gravship] 飞船区域清理完成，共清除 {clearedThings} 个阻挡物");
+				Log.Message($"[Gravship] 飞船周围3格范围清理完成，共清除 {clearedThings} 个物体");
+				
+				// 立即清除飞船区域的战争迷雾（4格范围，比清除物体多1格）
+				try
+				{
+					// 创建更大的迷雾清除范围（4格半径）
+					HashSet<IntVec3> fogClearanceCells = new HashSet<IntVec3>();
+					foreach (IntVec3 shipCell in shipCells)
+					{
+						foreach (IntVec3 fogCell in GenRadial.RadialCellsAround(shipCell, 4f, true))
+						{
+							if (fogCell.InBounds(map))
+							{
+								fogClearanceCells.Add(fogCell);
+							}
+						}
+					}
+					
+					int unfoggedCount = 0;
+					foreach (IntVec3 cell in fogClearanceCells)
+					{
+						if (cell.InBounds(map))
+						{
+							// 强制清除迷雾
+							map.fogGrid.Unfog(cell);
+							unfoggedCount++;
+						}
+					}
+					
+					// 对飞船中心位置使用FloodUnfog，确保完全清除
+					if (shipCells.Any())
+					{
+						IntVec3 centerCell = new IntVec3(
+							(int)shipCells.Average(c => c.x),
+							0,
+							(int)shipCells.Average(c => c.z)
+						);
+						
+						try
+						{
+							Verse.FloodFillerFog.FloodUnfog(centerCell, map);
+						}
+						catch (Exception floodEx)
+						{
+							Log.Warning($"[Gravship] FloodUnfog失败于位置 {centerCell}: {floodEx.Message}");
+						}
+					}
+					
+					Log.Message($"[Gravship] 立即清除了 {unfoggedCount} 个格子的战争迷雾（4格范围）");
+				}
+				catch (Exception fogEx)
+				{
+					Log.Error($"[Gravship] 清除战争迷雾时发生错误: {fogEx.Message}");
+				}
 			}
 			catch (Exception ex)
 			{
-				Log.Error($"[Gravship] 清理飞船区域时发生错误: {ex.Message}\n{ex.StackTrace}");
+				Log.Error($"[Gravship] 清理飞船周围区域时发生错误: {ex.Message}\n{ex.StackTrace}");
 			}
 			
 			HashSet<IntVec3> hashSet = new HashSet<IntVec3>();
