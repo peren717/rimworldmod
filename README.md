@@ -10,7 +10,6 @@ A RimWorld mod that allows converting gravships into spaceships.
 
 - Convert gravships to spaceships for space travel
 - Save and restore gravship configurations
-- Zero starting pawns scenario support
 - Custom map generation for orbital scenarios
 
 ## Installation
