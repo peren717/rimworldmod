@@ -1,0 +1,92 @@
+<svg width="640" height="360" viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景星空 -->
+  <defs>
+    <radialGradient id="spaceGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f0f23;stop-opacity:1" />
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="640" height="360" fill="url(#spaceGradient)"/>
+  
+  <!-- 星星 -->
+  <circle cx="50" cy="40" r="1" fill="#ffffff" opacity="0.8"/>
+  <circle cx="120" cy="60" r="1.5" fill="#ffffff" opacity="0.6"/>
+  <circle cx="200" cy="30" r="1" fill="#ffffff" opacity="0.9"/>
+  <circle cx="300" cy="50" r="1" fill="#ffffff" opacity="0.7"/>
+  <circle cx="450" cy="35" r="1.5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="550" cy="45" r="1" fill="#ffffff" opacity="0.6"/>
+  <circle cx="590" cy="25" r="1" fill="#ffffff" opacity="0.9"/>
+  <circle cx="80" cy="320" r="1" fill="#ffffff" opacity="0.7"/>
+  <circle cx="180" cy="330" r="1.5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="280" cy="310" r="1" fill="#ffffff" opacity="0.6"/>
+  <circle cx="380" cy="340" r="1" fill="#ffffff" opacity="0.9"/>
+  <circle cx="480" cy="325" r="1.5" fill="#ffffff" opacity="0.7"/>
+  <circle cx="580" cy="315" r="1" fill="#ffffff" opacity="0.8"/>
+  
+  <!-- 左侧重力飞船 -->
+  <g transform="translate(80,180)">
+    <!-- 飞船主体 -->
+    <ellipse cx="0" cy="0" rx="60" ry="25" fill="#4a5568" stroke="#2d3748" stroke-width="2"/>
+    <!-- 重力核心 -->
+    <circle cx="0" cy="0" r="15" fill="#4299e1" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="8" fill="#63b3ed" opacity="0.8"/>
+    <!-- 推进器 -->
+    <rect x="-50" y="-8" width="15" height="16" fill="#2d3748" rx="2"/>
+    <rect x="-50" y="8" width="15" height="16" fill="#2d3748" rx="2"/>
+    <!-- 重力场效果 -->
+    <circle cx="0" cy="0" r="35" fill="none" stroke="#4299e1" stroke-width="1" opacity="0.3"/>
+    <circle cx="0" cy="0" r="45" fill="none" stroke="#4299e1" stroke-width="1" opacity="0.2"/>
+  </g>
+  
+  <!-- 箭头转换指示 -->
+  <g transform="translate(320,180)">
+    <path d="M-40,0 L40,0 M25,-10 L40,0 L25,10" stroke="#e2e8f0" stroke-width="3" fill="none"/>
+    <text x="0" y="-20" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="14" font-weight="bold">NEW GAME+</text>
+  </g>
+  
+  <!-- 右侧太空船 -->
+  <g transform="translate(560,180)">
+    <!-- 太空船主体 -->
+    <rect x="-50" y="-20" width="100" height="40" fill="#2d3748" rx="5"/>
+    <!-- 船体细节 -->
+    <rect x="-45" y="-15" width="90" height="30" fill="#4a5568" rx="3"/>
+    <!-- 驾驶舱 -->
+    <rect x="20" y="-10" width="25" height="20" fill="#1a202c" rx="2"/>
+    <rect x="22" y="-8" width="21" height="16" fill="#4299e1" opacity="0.3" rx="1"/>
+    <!-- 推进器 -->
+    <rect x="-55" y="-12" width="10" height="8" fill="#e53e3e"/>
+    <rect x="-55" y="4" width="10" height="8" fill="#e53e3e"/>
+    <!-- 推进火焰 -->
+    <polygon points="-65,-12 -75,-8 -70,-4 -65,-4" fill="#ff6b35" opacity="0.8"/>
+    <polygon points="-65,4 -75,8 -70,12 -65,12" fill="#ff6b35" opacity="0.8"/>
+    <!-- 太空船光效 -->
+    <rect x="-50" y="-20" width="100" height="40" fill="none" stroke="#63b3ed" stroke-width="1" opacity="0.4" rx="5"/>
+  </g>
+  
+  <!-- 标题 -->
+  <text x="320" y="80" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="32" font-weight="bold">GRAVSHIP TO SPACESHIP</text>
+  <text x="320" y="110" text-anchor="middle" fill="#a0aec0" font-family="Arial, sans-serif" font-size="16">New Game Plus for RimWorld</text>
+  
+  <!-- 底部特性说明 -->
+  <g transform="translate(320,280)">
+    <text x="-150" y="0" text-anchor="start" fill="#cbd5e0" font-family="Arial, sans-serif" font-size="12">✓ Keep your spaceship design</text>
+    <text x="-150" y="20" text-anchor="start" fill="#cbd5e0" font-family="Arial, sans-serif" font-size="12">✓ Preserve colonist relationships</text>
+    <text x="20" y="0" text-anchor="start" fill="#cbd5e0" font-family="Arial, sans-serif" font-size="12">✓ Maintain research progress</text>
+    <text x="20" y="20" text-anchor="start" fill="#cbd5e0" font-family="Arial, sans-serif" font-size="12">✓ Continue your story</text>
+  </g>
+  
+  <!-- 装饰性粒子效果 -->
+  <circle cx="250" cy="120" r="2" fill="#4299e1" opacity="0.6"/>
+  <circle cx="390" cy="140" r="1.5" fill="#63b3ed" opacity="0.8"/>
+  <circle cx="270" cy="240" r="1" fill="#4299e1" opacity="0.7"/>
+  <circle cx="370" cy="220" r="2" fill="#63b3ed" opacity="0.5"/>
+</svg>
