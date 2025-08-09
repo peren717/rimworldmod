@@ -393,53 +393,45 @@ public class GravshipRestorer : GameComponent
 				}
 				Log.Message($"[Gravship] 飞船周围3格范围清理完成，共清除 {clearedThings} 个物体");
 				
-				// 立即清除飞船区域的战争迷雾（4格范围，比清除物体多1格）
+				// 立即清除飞船区域的战争迷雾（飞船周围1格范围）
 				try
 				{
-					// 创建更大的迷雾清除范围（4格半径）
+					// 创建飞船周围1格范围的格子集合
 					HashSet<IntVec3> fogClearanceCells = new HashSet<IntVec3>();
 					foreach (IntVec3 shipCell in shipCells)
 					{
-						foreach (IntVec3 fogCell in GenRadial.RadialCellsAround(shipCell, 4f, true))
+						// 添加飞船格子本身
+						if (shipCell.InBounds(map))
 						{
-							if (fogCell.InBounds(map))
+							fogClearanceCells.Add(shipCell);
+						}
+						
+						// 添加周围1格范围的格子
+						foreach (IntVec3 adjacentCell in GenRadial.RadialCellsAround(shipCell, 1f, true))
+						{
+							if (adjacentCell.InBounds(map))
 							{
-								fogClearanceCells.Add(fogCell);
+								fogClearanceCells.Add(adjacentCell);
 							}
 						}
 					}
 					
-					int unfoggedCount = 0;
+					// 对每个格子都使用FloodUnfog来清除战争迷雾
+					int floodUnfogCount = 0;
 					foreach (IntVec3 cell in fogClearanceCells)
 					{
-						if (cell.InBounds(map))
-						{
-							// 强制清除迷雾
-							map.fogGrid.Unfog(cell);
-							unfoggedCount++;
-						}
-					}
-					
-					// 对飞船中心位置使用FloodUnfog，确保完全清除
-					if (shipCells.Any())
-					{
-						IntVec3 centerCell = new IntVec3(
-							(int)shipCells.Average(c => c.x),
-							0,
-							(int)shipCells.Average(c => c.z)
-						);
-						
 						try
 						{
-							Verse.FloodFillerFog.FloodUnfog(centerCell, map);
+							Verse.FloodFillerFog.FloodUnfog(cell, map);
+							floodUnfogCount++;
 						}
 						catch (Exception floodEx)
 						{
-							Log.Warning($"[Gravship] FloodUnfog失败于位置 {centerCell}: {floodEx.Message}");
+							Log.Warning($"[Gravship] FloodUnfog失败于格子 {cell}: {floodEx.Message}");
 						}
 					}
 					
-					Log.Message($"[Gravship] 立即清除了 {unfoggedCount} 个格子的战争迷雾（4格范围）");
+					Log.Message($"[Gravship] 对飞船周围1格范围内的 {floodUnfogCount} 个格子执行了FloodUnfog清除战争迷雾");
 				}
 				catch (Exception fogEx)
 				{
