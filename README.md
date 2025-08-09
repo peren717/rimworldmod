@@ -1,54 +1,38 @@
 # Gravship to Spaceship
 
-一个 RimWorld 模组，允许玩家将重力船转换为太空船。
+A RimWorld mod that allows converting gravships into spaceships.
 
-## 功能特性
+## Features
 
-- 重力船到太空船的转换功能
-- 零小人开局场景支持
-- 重力船数据的保存和恢复
-- 与 Save Our Ship 模组的兼容性
+- Convert gravships to spaceships for space travel
+- Save and restore gravship configurations
+- Zero starting pawns scenario support
+- Custom map generation for orbital scenarios
 
-## 安装方法
+## Installation
 
-1. 将模组文件夹放置在 RimWorld 的 Mods 目录中
-2. 在游戏中启用模组
-3. 确保模组加载顺序正确
+1. Subscribe to this mod on Steam Workshop or download manually
+2. Place in your RimWorld Mods folder
+3. Enable in the mod list before starting a new game
 
-## 依赖模组
+## Requirements
 
-- Harmony
-- Save Our Ship Simplified（推荐）
+- RimWorld 1.6+
+- Save Our Ship 2 (recommended)
 
-## 开发信息
+## Recent Changes
 
-### 编译
+- Removed ideology-related functionality to prevent compatibility issues
+- Fixed "Removed null ideos" errors
+- Improved gravship restoration logic
 
-在 `csproj` 目录下运行：
-```bash
-dotnet build
-```
+## Development
 
-### 项目结构
+This mod is built using .NET Framework 4.7.2. To build from source:
 
-- `About/` - 模组信息和描述
-- `Assemblies/` - 编译后的 DLL 文件
-- `Defs/` - 游戏定义文件
-- `Languages/` - 本地化文件
-- `Patches/` - Harmony 补丁
-- `csproj/` - C# 源代码
+1. Open the project in Visual Studio or use `dotnet build`
+2. The compiled DLL will be placed in the Assemblies folder automatically
 
-## 更新日志
+## License
 
-### 最新版本
-- 移除了意识形态相关功能以避免兼容性问题
-- 优化了重力船数据保存和恢复逻辑
-- 修复了零小人开局的相关问题
-
-## 许可证
-
-请遵循 RimWorld 模组开发的相关许可协议。
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request 来改进这个模组。
+This mod is provided as-is for the RimWorld community.
