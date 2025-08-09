@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageInfo>
+  <friendlyNameNative>简体中文</friendlyNameNative>
+  <friendlyNameEnglish>Chinese Simplified</friendlyNameEnglish>
+  <canBeTiny>true</canBeTiny>
+  <languageWorkerClass>LanguageWorker_Chinese</languageWorkerClass>
+  <credits>
+  </credits>
+</LanguageInfo>

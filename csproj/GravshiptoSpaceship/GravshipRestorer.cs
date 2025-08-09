@@ -187,11 +187,11 @@ public class GravshipRestorer : GameComponent
 				}
 			}
 			
-			// 清理飞船区域
-			Log.Message($"[Gravship] 清理飞船区域，共 {shipCells.Count} 个格子");
+			// 清理飞船区域 - 彻底清除所有阻挡物
+			Log.Message($"[Gravship] 开始彻底清理飞船区域，共 {shipCells.Count} 个格子");
+			int clearedThings = 0;
 			try
 			{
-				// 使用RimWorld内置的地形清理功能
 				foreach (IntVec3 cell in shipCells)
 				{
 					if (cell.InBounds(map))
@@ -201,38 +201,179 @@ public class GravshipRestorer : GameComponent
 						for (int i = thingsAtCell.Count - 1; i >= 0; i--)
 						{
 							Thing thing = thingsAtCell[i];
-							// 不删除小人（Pawn）和其他重要实体
-							if (thing.def.destroyable && !thing.Destroyed && !(thing is Pawn))
+							
+							// 保留小人
+							if (thing is Pawn)
 							{
-								thing.Destroy();
+								continue;
+							}
+							
+							// 强制清除所有非小人物体，包括：
+							// - 建筑物 (Buildings)
+							// - 植物 (Plants) 
+							// - 岩石和矿物 (Mineable)
+							// - 热喷泉 (Geyser)
+							// - 物品 (Items)
+							// - 碎片 (Filth)
+							// - 地图特征 (Natural)
+							// - 任何其他物体
+							bool shouldDestroy = true; // 默认清除所有非小人物体
+							
+							// 只有小人不清除，其他所有东西都清除
+							if (thing is Pawn)
+							{
+								shouldDestroy = false;
+							}
+							
+							if (shouldDestroy)
+							{
+								try
+								{
+									Log.Message($"[Gravship] 强制清除: {thing.def.defName} (类别: {thing.def.category}) at {cell}");
+									
+									// 对于特殊物体使用不同的清除方式
+									if (thing.def.defName.Contains("Geyser") || thing.def.defName.Contains("geyser"))
+									{
+										// 热喷泉特殊处理
+										Log.Message($"[Gravship] 检测到热喷泉，强制移除: {thing.def.defName}");
+									}
+									
+									// 强制销毁，不管是否可销毁
+									if (thing.def.destroyable)
+									{
+										thing.Destroy(DestroyMode.Vanish);
+									}
+									else
+									{
+										// 对于不可销毁的物体，尝试直接从地图移除
+										try
+										{
+											thing.DeSpawn(DestroyMode.Vanish);
+											Log.Message($"[Gravship] 通过DeSpawn移除不可销毁物体: {thing.def.defName}");
+										}
+										catch
+										{
+											// 最后手段：直接从thingGrid移除
+											map.thingGrid.Deregister(thing);
+											Log.Message($"[Gravship] 通过thingGrid.Deregister强制移除: {thing.def.defName}");
+										}
+									}
+									
+									clearedThings++;
+								}
+								catch (Exception destroyEx)
+								{
+									Log.Warning($"[Gravship] 无法清除 {thing.def.defName}: {destroyEx.Message}");
+									// 尝试备用清除方法
+									try
+									{
+										map.thingGrid.Deregister(thing);
+										Log.Message($"[Gravship] 使用备用方法成功移除: {thing.def.defName}");
+										clearedThings++;
+									}
+									catch (Exception backupEx)
+									{
+										Log.Error($"[Gravship] 备用清除方法也失败: {thing.def.defName} - {backupEx.Message}");
+									}
+								}
 							}
 						}
 						
 						// 清理屋顶
-						map.roofGrid.SetRoof(cell, null);
+						if (map.roofGrid.RoofAt(cell) != null)
+						{
+							map.roofGrid.SetRoof(cell, null);
+						}
 						
 						// 清理区域设置
-						map.zoneManager.ZoneAt(cell)?.RemoveCell(cell);
-						map.areaManager.BuildRoof[cell] = false;
-						map.areaManager.NoRoof[cell] = false;
-						
-						// 如果地形不可通行，替换为可通行地形
-						TerrainDef currentTerrain = map.terrainGrid.TerrainAt(cell);
-						if (currentTerrain.passability == Traversability.Impassable || currentTerrain.dangerous)
+						Zone zoneAt = map.zoneManager.ZoneAt(cell);
+						if (zoneAt != null)
 						{
-							TerrainDef replacementTerrain = map.Biome.TerrainForAffordance(TerrainAffordanceDefOf.Medium);
-							if (replacementTerrain != null)
+							zoneAt.RemoveCell(cell);
+						}
+						
+						// 清理建造区域设置
+						if (map.areaManager?.BuildRoof != null)
+						{
+							map.areaManager.BuildRoof[cell] = false;
+						}
+						if (map.areaManager?.NoRoof != null)
+						{
+							map.areaManager.NoRoof[cell] = false;
+						}
+						
+						// 强制替换所有特殊地形为普通地形
+						TerrainDef currentTerrain = map.terrainGrid.TerrainAt(cell);
+						if (currentTerrain != null)
+						{
+							bool needsReplacement = false;
+							
+							// 检查是否需要替换地形
+							if (currentTerrain.passability == Traversability.Impassable ||
+								currentTerrain.dangerous ||
+								currentTerrain.defName.Contains("Rock") ||
+								currentTerrain.defName.Contains("Wall") ||
+								currentTerrain.defName.Contains("Geyser") ||
+								currentTerrain.defName.Contains("geyser") ||
+								currentTerrain.defName.Contains("Steam") ||
+								currentTerrain.defName.Contains("Lava") ||
+								currentTerrain.defName.Contains("Water") ||
+								currentTerrain.defName.Contains("Marsh") ||
+								currentTerrain.defName.Contains("Mud") ||
+								currentTerrain.affordances.Contains(TerrainAffordanceDefOf.Bridgeable))
 							{
-								map.terrainGrid.SetTerrain(cell, replacementTerrain);
+								needsReplacement = true;
+							}
+							
+							if (needsReplacement)
+							{
+								// 尝试使用合适的地面地形
+								TerrainDef replacementTerrain = null;
+								
+								// 优先使用生物群系的中等地形
+								if (map.Biome != null)
+								{
+									replacementTerrain = map.Biome.TerrainForAffordance(TerrainAffordanceDefOf.Medium);
+								}
+								
+								// 如果没有找到合适的地形，使用土地
+								if (replacementTerrain == null)
+								{
+									replacementTerrain = TerrainDefOf.Soil;
+								}
+								
+								if (replacementTerrain != null)
+								{
+									map.terrainGrid.SetTerrain(cell, replacementTerrain);
+									Log.Message($"[Gravship] 替换特殊地形: {currentTerrain.defName} -> {replacementTerrain.defName} at {cell}");
+								}
+							}
+						}
+						
+						// 最后检查：确保该格子完全清空（除了小人）
+						List<Thing> remainingThings = map.thingGrid.ThingsListAt(cell).ToList();
+						foreach (Thing remaining in remainingThings)
+						{
+							if (!(remaining is Pawn))
+							{
+								Log.Warning($"[Gravship] 发现残留物体，再次尝试清除: {remaining.def.defName} at {cell}");
+								try
+								{
+									map.thingGrid.Deregister(remaining);
+								}
+								catch (Exception finalEx)
+								{
+									Log.Error($"[Gravship] 最终清除失败: {remaining.def.defName} - {finalEx.Message}");
+								}
 							}
 						}
 					}
 				}
-				Log.Message("[Gravship] 飞船区域清理完成");
+				Log.Message($"[Gravship] 飞船区域清理完成，共清除 {clearedThings} 个阻挡物");
 			}
 			catch (Exception ex)
 			{
-				Log.Error($"[Gravship] 清理飞船区域时发生错误: {ex.Message}");
+				Log.Error($"[Gravship] 清理飞船区域时发生错误: {ex.Message}\n{ex.StackTrace}");
 			}
 			
 			HashSet<IntVec3> hashSet = new HashSet<IntVec3>();
@@ -559,6 +700,17 @@ public class GravshipRestorer : GameComponent
 			Log.Message("[Gravship] 電力網（PowerNet）を再構築しました。");
 			GravshipConnectionUtility.UpdateAllGravshipConnections(map);
 			Log.Message("[Gravship] グラヴシップ接続情報を再構築しました");
+			
+			// 延迟清除重力船区域的迷雾，确保所有建筑都已完全恢复
+			LongEventHandler.ExecuteWhenFinished(delegate
+			{
+				// 再次延迟一点时间，确保地图完全初始化
+				GameComponent_OnetimeTicker.Schedule(Find.TickManager.TicksGame + 30, delegate
+				{
+					UnfogGravshipArea(map);
+					Log.Message("[Gravship] 重力船区域迷雾清除完成（延迟执行）");
+				});
+			});
 		}
 		if (data.Things == null || data.Things.Count <= 0)
 		{
@@ -608,5 +760,82 @@ public class GravshipRestorer : GameComponent
 				Log.Message($"[Gravship] 宇宙旅行により {num7}年 {num8}日 {num9}時間（{num10:N0} tick）経過させました");
 			}
 		});
+	}
+
+	/// <summary>
+	/// 为重力船区域清除战争迷雾，提供视野支持
+	/// </summary>
+	private void UnfogGravshipArea(Map map)
+	{
+		if (map == null)
+		{
+			Log.Warning("[Gravship] 无法获取地图，跳过迷雾清除");
+			return;
+		}
+
+		// 查找地图上的重力船相关建筑
+		List<Thing> gravshipBuildings = new List<Thing>();
+		foreach (Thing thing in map.listerThings.AllThings)
+		{
+			if (thing.def.defName.Contains("Grav") || 
+				thing.def.defName.Contains("Ship") ||
+				(thing.def.building?.shipPart == true))
+			{
+				gravshipBuildings.Add(thing);
+			}
+		}
+
+		if (gravshipBuildings.Count == 0)
+		{
+			Log.Message("[Gravship] 未找到重力船建筑，跳过迷雾清除");
+			return;
+		}
+
+		// 收集所有重力船相关的格子，包括更大的范围
+		HashSet<IntVec3> gravshipCells = new HashSet<IntVec3>();
+		foreach (Thing building in gravshipBuildings)
+		{
+			// 添加建筑本身占用的格子
+			foreach (IntVec3 cell in building.OccupiedRect())
+			{
+				gravshipCells.Add(cell);
+			}
+			
+			// 添加建筑周围更大范围的格子（3格半径）
+			foreach (IntVec3 cell in GenRadial.RadialCellsAround(building.Position, 3f, true))
+			{
+				if (cell.InBounds(map))
+				{
+					gravshipCells.Add(cell);
+				}
+			}
+		}
+
+		// 强制清除所有重力船格子的战争迷雾
+		int unfoggedCount = 0;
+		foreach (IntVec3 cell in gravshipCells)
+		{
+			if (cell.InBounds(map))
+			{
+				// 强制清除迷雾，不管当前状态
+				map.fogGrid.Unfog(cell);
+				unfoggedCount++;
+			}
+		}
+
+		// 对每个重力船建筑都使用FloodUnfog，确保完全清除
+		foreach (Thing building in gravshipBuildings)
+		{
+			try
+			{
+				Verse.FloodFillerFog.FloodUnfog(building.Position, map);
+			}
+			catch (System.Exception ex)
+			{
+				Log.Warning($"[Gravship] FloodUnfog失败于位置 {building.Position}: {ex.Message}");
+			}
+		}
+
+		Log.Message($"[Gravship] 强力清除了 {unfoggedCount} 个格子的战争迷雾，处理了 {gravshipBuildings.Count} 个重力船建筑");
 	}
 }
