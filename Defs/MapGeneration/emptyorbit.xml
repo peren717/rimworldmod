@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <MapGeneratorDef ParentName="SpaceMapGenerator">
+    <defName>EmptyOrbitMap</defName>
+    <label>empty orbit</label>
+    <genSteps>
+      <li>GenStep_ForceStartSpot_Gravship</li>
+      <li>FindPlayerStartSpot</li>
+      <li>ScenParts</li>
+      <li>FogSpace</li>
+    </genSteps>
+  </MapGeneratorDef>
+  <GenStepDef>
+    <defName>GenStep_ForceStartSpot_Gravship</defName>
+    <order>100</order>
+    <genStep Class="GravshiptoSpaceship.GenStep_ForceStartSpot" />
+  </GenStepDef>
+  <GenStepDef>
+    <defName>FogSpace</defName>
+    <order>1500</order>
+    <genStep Class="GenStep_FogSpace" />
+  </GenStepDef>
+</Defs>

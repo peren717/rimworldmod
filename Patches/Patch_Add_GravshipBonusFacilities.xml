@@ -1,0 +1,65 @@
+<Patch>
+  <Operation Class="PatchOperationAdd">
+    <xpath>/Defs/RitualOutcomeEffectDef[defName="GravshipLaunch"]/comps</xpath>
+    <value>
+      <li Class="GravshiptoSpaceship.RitualOutcomeComp_ComputerCore">
+        <label>computer core</label>
+      </li>
+      <li Class="GravshiptoSpaceship.RitualOutcomeComp_SensorCluster">
+        <label>sensor cluster</label>
+      </li>
+    </value>
+  </Operation>
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/ThingDef[defName="Ship_Engine"]/placeWorkers</xpath>
+    <value>
+      <li>PlaceWorker_GravshipThruster</li>
+    </value>
+  </Operation>
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/ThingDef[defName="Ship_Engine"]</xpath>
+    <value>
+      <drawPlaceWorkersWhileSelected>true</drawPlaceWorkersWhileSelected>
+    </value>
+  </Operation>
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/ThingDef[defName="Ship_Engine"]/comps</xpath>
+    <value>
+      <li Class="CompProperties_GravshipThruster">
+        <flameSize>8</flameSize>
+        <exclusionAreaSize>(3, 0, 9)</exclusionAreaSize>
+        <exclusionAreaOffset>(-1, 0, -10)</exclusionAreaOffset>
+        <flameOffsetsPerDirection>
+          <li>(0, 0, 3.6)</li>
+          <!-- North -->
+          <li>(0, 0, 2)</li>
+          <!-- West -->
+          <li>(0, 0, 2)</li>
+          <!-- South -->
+          <li>(0, 0, 2)</li>
+          <!-- East -->
+        </flameOffsetsPerDirection>
+        <flameShaderType>MoteGlow</flameShaderType>
+        <flameShaderParameters>
+          <_MainTex>/Things/Mote/LargeThruster_Burn</_MainTex>
+        </flameShaderParameters>
+        <exhaustSettings>
+          <exhaustFleckDef>GravshipThrusterExhaust</exhaustFleckDef>
+          <emissionsPerSecond>40.0</emissionsPerSecond>
+          <spawnRadiusRange>0.0~0.5</spawnRadiusRange>
+          <velocity>(0.0,0.0,-20.0)</velocity>
+          <velocityRotationRange>-10.0~10.0</velocityRotationRange>
+          <velocityMultiplierRange>0.8~1.2</velocityMultiplierRange>
+          <rotationOverTimeRange>-180.0~180.0</rotationOverTimeRange>
+          <scaleRange>3.0~5.0</scaleRange>
+        </exhaustSettings>
+      </li>
+    </value>
+  </Operation>
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/ThingDef[defName="Ship_Engine"]/comps</xpath>
+    <value>
+      <li Class="CompProperties_Breakdownable" />
+    </value>
+  </Operation>
+</Patch>

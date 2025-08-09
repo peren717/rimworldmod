@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <GravshipRange_Inf>無限</GravshipRange_Inf>
+  <FuelFixed50>バイオ液化燃料x</FuelFixed50>
+  <GravshipThrusterNoReactor>機能していない: 起動済みの反応炉が無い</GravshipThrusterNoReactor>
+  <GravshipToSpaceship.SelectSaveFileLabel>復元に使用するデータを選択:</GravshipToSpaceship.SelectSaveFileLabel>
+  <GravshipToSpaceship.NoSaveFilesLabel>ファイルが見つかりませんでした。宇宙船を打ち上げて下さい。</GravshipToSpaceship.NoSaveFilesLabel>
+  <GravshipToSpaceship.ModSettingsTitle>ニューゲーム+復元設定</GravshipToSpaceship.ModSettingsTitle>
+</LanguageData>

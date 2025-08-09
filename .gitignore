@@ -1,0 +1,42 @@
+# 编译产物
+csproj/*/bin/
+csproj/*/obj/
+*.dll
+*.pdb
+*.exe
+
+# Visual Studio / MSBuild
+.vs/
+*.user
+*.suo
+*.sln.docstates
+*.userprefs
+*.pidb
+*.booproj
+
+# 临时文件
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+
+# 备份文件
+*.bak
+*.backup
+*.orig
+
+# IDE 文件
+.vscode/
+.idea/
+
+# 系统文件
+desktop.ini
+.directory
+
+# RimWorld 特定
+# 保留 Assemblies 目录中的 DLL 文件（这是模组的最终产物）
+!Assemblies/*.dll

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <GravshipRange_Inf>Unlimited</GravshipRange_Inf>
+  <FuelFixed50>chemfuel</FuelFixed50>
+  <GravshipThrusterNoReactor>Not functional: Ship reactor not ready</GravshipThrusterNoReactor>
+  <GravshipToSpaceship.SelectSaveFileLabel>Select export file to restore:</GravshipToSpaceship.SelectSaveFileLabel>
+  <GravshipToSpaceship.NoSaveFilesLabel>No files found. Launch a ship to create one.</GravshipToSpaceship.NoSaveFilesLabel>
+  <GravshipToSpaceship.ModSettingsTitle>New game+ Restore Settings</GravshipToSpaceship.ModSettingsTitle>
+</LanguageData>

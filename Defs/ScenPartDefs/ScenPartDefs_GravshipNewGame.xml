@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ScenPartDef>
+    <defName>NoStartingPawns</defName>
+    <label>无初始小人</label>
+    <scenPartClass>GravshiptoSpaceship.ScenPart_NoStartingPawns</scenPartClass>
+    <category>StartingImportant</category>
+    <description>开始游戏时不生成任何小人，完全依靠重力船恢复系统来获得小人。</description>
+  </ScenPartDef>
+</Defs>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ScenarioDef ParentName="ScenarioBase">
+    <defName>GravshipNewGamePlus</defName>
+    <label>強くてニューゲーム</label>
+    <description>Start a new game with your previously exported gravship. Begin with a single colonist and no starting items - rely entirely on your restored gravship.</description>
+    <scenario>
+      <summary>New Game Plus with Gravship - Single Colonist Start</summary>
+      <playerFaction>
+        <def>PlayerFaction</def>
+        <factionDef>PlayerColony</factionDef>
+      </playerFaction>
+      <parts>
+        <!-- 配置起始小人数量为1 -->
+        <li Class="ScenPart_ConfigPage_ConfigureStartingPawns">
+          <def>ConfigPage_ConfigureStartingPawns</def>
+          <pawnCount>1</pawnCount>
+          <pawnChoiceCount>8</pawnChoiceCount>
+        </li>
+        
+        <!-- 小人到达方式设为站立 -->
+        <li Class="ScenPart_PlayerPawnsArriveMethod">
+          <def>PlayerPawnsArriveMethod</def>
+          <method>Standing</method>
+        </li>
+        
+        <!-- 使用重力船恢复系统 -->
+        <li Class="GravshiptoSpaceship.ScenPart_GravshipRestore">
+          <def>GravshipRestore</def>
+        </li>
+        
+      </parts>
+    </scenario>
+  </ScenarioDef>
+</Defs>
