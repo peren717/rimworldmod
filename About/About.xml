@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>GravshiptoSpaceship</name>
-  <author>tujido</author>
+  <name>GravshipNewGamePlus</name>
+  <author>Peren717</author>
   <description>
-グラブシップ上で宇宙船のパーツを有効化します。
-Activate Spaceship parts on the Gravship.
+🚀 **Gravship New Game Plus** - 重力船太空船改造模组
 
-基于原作者辻堂的mod修改而来: https://steamcommunity.com/sharedfiles/filedetails/?id=3531942788
-Based on the original mod by 辻堂: https://steamcommunity.com/sharedfiles/filedetails/?id=3531942788
+**【核心功能】**
+• 在重力船上激活太空船部件功能
+• 提供全新的"重力船新游戏+"开局场景
+• 支持中文、英文、日文多语言界面
+
+**【游戏特色】**
+• 🛸 **重力船改造**: 将重力船转换为功能完整的太空船
+• 🎮 **特殊开局**: 独特的单人投放舱开局体验
+
+**【技术信息】**
+• 兼容版本: RimWorld 1.6
+• 模组类型: 游戏机制增强
+• 依赖项: 无特殊依赖
+
+**【致谢】**
+基于原作者辻堂的优秀作品修改而来
+原版链接: https://steamcommunity.com/sharedfiles/filedetails/?id=3531942788
+
+原作者辻堂氏の素晴らしい作品をベースに改造
+オリジナルモッド: https://steamcommunity.com/sharedfiles/filedetails/?id=3531942788
   </description>
-  <packageId>Gravshipto.Spaceship</packageId>
+  <packageId>Peren717.SpaceshipNGP</packageId>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
