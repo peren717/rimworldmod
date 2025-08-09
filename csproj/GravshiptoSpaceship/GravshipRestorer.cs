@@ -61,16 +61,28 @@ public class GravshipRestorer : GameComponent
 
 	public override void FinalizeInit()
 	{
-		if (initialized || hasRestored)
+		// FinalizeInit中只做基本初始化，不执行恢复逻辑
+		if (!initialized)
 		{
+			initialized = true;
+		}
+	}
+
+	public void TriggerRestore()
+	{
+		if (hasRestored)
+		{
+			Log.Message("[Gravship] 重力船已经恢复过，跳过");
 			return;
 		}
-		initialized = true;
+		
 		// 检查当前场景是否包含重力船恢复组件
 		if (Find.Scenario?.AllParts?.Any(part => part is GravshiptoSpaceship.ScenPart_GravshipRestore) != true)
 		{
+			Log.Message("[Gravship] 当前场景不包含重力船恢复组件，跳过");
 			return;
 		}
+		
 		string path = Path.Combine(GenFilePaths.ConfigFolderPath, "GravshipToSpaceship");
 		string text = GravshiptoSpaceshipMod.Settings?.selectedFileName;
 		string text2 = Path.Combine(path, text ?? "");
@@ -79,6 +91,7 @@ public class GravshipRestorer : GameComponent
 			Log.Warning("[Gravship] 復元ファイルが存在しません: " + text2);
 			return;
 		}
+		
 		try
 		{
 			Scribe.loader.InitLoading(text2);
