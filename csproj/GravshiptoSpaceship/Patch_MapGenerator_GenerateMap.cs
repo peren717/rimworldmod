@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using HarmonyLib;
 using Verse;
 
@@ -10,7 +11,8 @@ public static class Patch_MapGenerator_GenerateMap
 {
 	private static void Prefix(ref IntVec3 mapSize)
 	{
-		if (!(Find.Scenario?.name == "強くてニューゲーム"))
+		// 检查当前场景是否包含重力船恢复组件
+		if (Find.Scenario?.AllParts?.Any(part => part is GravshiptoSpaceship.ScenPart_GravshipRestore) != true)
 		{
 			return;
 		}

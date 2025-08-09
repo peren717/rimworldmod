@@ -39,3 +39,4 @@ c:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\GravshiptoSpaceship\
 c:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\GravshiptoSpaceship\csproj\obj\Release\net472\Gravship.F2266514.Up2Date
 c:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\GravshiptoSpaceship\csproj\obj\Release\net472\GravshiptoSpaceship.dll
 c:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\GravshiptoSpaceship\csproj\obj\Release\net472\GravshiptoSpaceship.pdb
+c:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\GravshiptoSpaceship\csproj\obj\Release\net472\GravshiptoSpaceship.sourcelink.json

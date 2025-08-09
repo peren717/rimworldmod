@@ -66,7 +66,8 @@ public class GravshipRestorer : GameComponent
 			return;
 		}
 		initialized = true;
-		if (Find.Scenario?.name != "強くてニューゲーム")
+		// 检查当前场景是否包含重力船恢复组件
+		if (Find.Scenario?.AllParts?.Any(part => part is GravshiptoSpaceship.ScenPart_GravshipRestore) != true)
 		{
 			return;
 		}
@@ -113,14 +114,16 @@ public class GravshipRestorer : GameComponent
 			MapGenerator.PlayerStartSpot = new IntVec3(map.Size.x / 2, 0, map.Size.z / 2);
 			Log.Message("プレイヤー開始地点を強制的に中央に設定");
 		}
-		if (Find.GameInitData != null)
-		{
-			foreach (Pawn item in Find.GameInitData.startingAndOptionalPawns.ToList())
-			{
-				Log.Message("[Gravship] ダミーポーン削除: " + item.LabelShortCap);
-				Find.GameInitData.startingAndOptionalPawns.Remove(item);
-			}
-		}
+		// 注释掉删除开局小人的逻辑，保留玩家选择的小人
+		// if (Find.GameInitData != null)
+		// {
+		//     foreach (Pawn item in Find.GameInitData.startingAndOptionalPawns.ToList())
+		//     {
+		//         Log.Message("[Gravship] ダミーポーン削除: " + item.LabelShortCap);
+		//         Find.GameInitData.startingAndOptionalPawns.Remove(item);
+		//     }
+		// }
+		Log.Message("[Gravship] 保留玩家选择的开局小人，不进行删除");
 		if (data.completedResearch != null)
 		{
 			foreach (string item2 in data.completedResearch)
@@ -193,12 +196,13 @@ public class GravshipRestorer : GameComponent
 				{
 					if (cell.InBounds(map))
 					{
-						// 清理该位置的所有物体
+						// 清理该位置的所有物体（但保留小人）
 						List<Thing> thingsAtCell = map.thingGrid.ThingsListAt(cell).ToList();
 						for (int i = thingsAtCell.Count - 1; i >= 0; i--)
 						{
 							Thing thing = thingsAtCell[i];
-							if (thing.def.destroyable && !thing.Destroyed)
+							// 不删除小人（Pawn）和其他重要实体
+							if (thing.def.destroyable && !thing.Destroyed && !(thing is Pawn))
 							{
 								thing.Destroy();
 							}

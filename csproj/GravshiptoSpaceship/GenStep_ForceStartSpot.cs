@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using RimWorld;
 using Verse;
 
@@ -13,9 +14,10 @@ public class GenStep_ForceStartSpot : GenStep
 		try
 		{
 			Log.Message("[Gravship] ForceStartSpot Generate() 呼び出し開始");
-			if (!ModsConfig.OdysseyActive || Find.Scenario?.name != "強くてニューゲーム")
+			// 检查是否启用了Odyssey DLC以及当前场景是否包含重力船恢复组件
+			if (!ModsConfig.OdysseyActive || Find.Scenario?.AllParts?.Any(part => part is GravshiptoSpaceship.ScenPart_GravshipRestore) != true)
 			{
-				Log.Message("[Gravship] OdysseyActive ではない、またはシナリオ名が一致しないため Space 塗りをスキップ");
+				Log.Message("[Gravship] OdysseyActive ではない、または重力船恢复场景ではないため Space 塗りをスキップ");
 				return;
 			}
 			MapGenerator.PlayerStartSpot = new IntVec3(map.Size.x / 2, 0, map.Size.z / 2);
