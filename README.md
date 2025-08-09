@@ -2,6 +2,10 @@
 
 A RimWorld mod that allows converting gravships into spaceships.
 
+**基于原作者辻堂的mod修改而来**: https://steamcommunity.com/sharedfiles/filedetails/?id=3531942788
+
+**Based on the original mod by 辻堂**: https://steamcommunity.com/sharedfiles/filedetails/?id=3531942788
+
 ## Features
 
 - Convert gravships to spaceships for space travel
@@ -18,7 +22,6 @@ A RimWorld mod that allows converting gravships into spaceships.
 ## Requirements
 
 - RimWorld 1.6+
-- Save Our Ship 2 (recommended)
 
 ## Recent Changes
 

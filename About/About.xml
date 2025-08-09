@@ -5,6 +5,9 @@
   <description>
 グラブシップ上で宇宙船のパーツを有効化します。
 Activate Spaceship parts on the Gravship.
+
+基于原作者辻堂的mod修改而来: https://steamcommunity.com/sharedfiles/filedetails/?id=3531942788
+Based on the original mod by 辻堂: https://steamcommunity.com/sharedfiles/filedetails/?id=3531942788
   </description>
   <packageId>Gravshipto.Spaceship</packageId>
   <supportedVersions>
