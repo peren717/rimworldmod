@@ -127,16 +127,7 @@ public class GravshipRestorer : GameComponent
 			MapGenerator.PlayerStartSpot = new IntVec3(map.Size.x / 2, 0, map.Size.z / 2);
 			Log.Message("プレイヤー開始地点を強制的に中央に設定");
 		}
-		// 注释掉删除开局小人的逻辑，保留玩家选择的小人
-		// if (Find.GameInitData != null)
-		// {
-		//     foreach (Pawn item in Find.GameInitData.startingAndOptionalPawns.ToList())
-		//     {
-		//         Log.Message("[Gravship] ダミーポーン削除: " + item.LabelShortCap);
-		//         Find.GameInitData.startingAndOptionalPawns.Remove(item);
-		//     }
-		// }
-		Log.Message("[Gravship] 保留玩家选择的开局小人，不进行删除");
+
 		if (data.completedResearch != null)
 		{
 			foreach (string item2 in data.completedResearch)
@@ -241,8 +232,6 @@ public class GravshipRestorer : GameComponent
 							
 							try
 							{
-								Log.Message($"[Gravship] 强制清除: {thing.def.defName} (类别: {thing.def.category}) at {cell}");
-								
 								// 使用最强力的清除方法 - 不管是什么物体都要清除
 								bool destroyed = false;
 								
@@ -253,7 +242,6 @@ public class GravshipRestorer : GameComponent
 									{
 										thing.Destroy(DestroyMode.Vanish);
 										destroyed = true;
-										Log.Message($"[Gravship] 通过Destroy成功清除: {thing.def.defName}");
 									}
 									catch (Exception ex1)
 									{
@@ -268,7 +256,6 @@ public class GravshipRestorer : GameComponent
 									{
 										thing.DeSpawn(DestroyMode.Vanish);
 										destroyed = true;
-										Log.Message($"[Gravship] 通过DeSpawn成功清除: {thing.def.defName}");
 									}
 									catch (Exception ex2)
 									{
@@ -404,7 +391,6 @@ public class GravshipRestorer : GameComponent
 						}
 					}
 				}
-				Log.Message($"[Gravship] 飞船周围3格范围清理完成，共清除 {clearedThings} 个物体");
 				
 				// 立即清除飞船区域的战争迷雾（飞船周围1格范围）
 				try
@@ -681,6 +667,16 @@ public class GravshipRestorer : GameComponent
 					}
 					try
 					{
+						// 特别检查低温休眠舱
+						bool isCryptosleepCasket = thing.def.defName.Contains("CryptosleepCasket") || 
+													thing.def.defName.Contains("Cryptosleep") ||
+													thing.def.defName.Contains("cryptosleep");
+						
+						if (isCryptosleepCasket)
+						{
+							Log.Message($"[Gravship] 正在处理低温休眠舱容器内容: {thing.def.defName} at {thing.Position}");
+						}
+						
 						// 获取容器
 						ThingOwner thingOwner = null;
 						if (thing is IThingHolder thingHolder)
@@ -706,8 +702,31 @@ public class GravshipRestorer : GameComponent
 						
 						if (thingOwner == null)
 						{
-							Log.Warning($"[Gravship] {thing.LabelCap} の innerContainer が見つかりません");
+							if (isCryptosleepCasket)
+							{
+								Log.Error($"[Gravship] 低温休眠舱 {thing.LabelCap} 的 innerContainer 未找到！这可能导致小人丢失！");
+							}
+							else
+							{
+								Log.Warning($"[Gravship] {thing.LabelCap} の innerContainer が見つかりません");
+							}
 							continue;
+						}
+						
+						if (isCryptosleepCasket)
+						{
+							Log.Message($"[Gravship] 低温休眠舱 {thing.def.defName} 容器内有 {thingOwner.Count} 个物体");
+							foreach (Thing containerThing in thingOwner)
+							{
+								if (containerThing is Pawn containerPawn)
+								{
+									Log.Message($"[Gravship] 休眠舱内发现小人: {containerPawn.Name?.ToStringFull ?? containerPawn.def.defName}");
+								}
+								else
+								{
+									Log.Message($"[Gravship] 休眠舱内发现物品: {containerThing.def.defName}");
+								}
+							}
 						}
 						
 						// 安全にファイル操作
@@ -734,7 +753,57 @@ public class GravshipRestorer : GameComponent
 							{
 								thingOwner.ExposeData();
 								Scribe.loader.FinalizeLoading();
-								Log.Message($"[Gravship] 中身復元成功: {thing.LabelCap}");
+								
+								if (isCryptosleepCasket)
+								{
+									Log.Message($"[Gravship] 低温休眠舱容器内容恢复完成: {thing.LabelCap}，现在容器内有 {thingOwner.Count} 个物体");
+									foreach (Thing restoredThing in thingOwner)
+									{
+										if (restoredThing is Pawn restoredPawn)
+										{
+											Log.Message($"[Gravship] 恢复后休眠舱内小人: {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName}");
+											
+											try
+											{
+												if (restoredPawn.Faction != Faction.OfPlayer)
+												{
+													Log.Message($"[Gravship] 将休眠舱内小人 {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName} 设置为玩家阵营");
+													restoredPawn.SetFactionDirect(Faction.OfPlayer);
+													
+													// 确保小人有正确的基本设置
+													if (restoredPawn.needs != null)
+													{
+														restoredPawn.needs.SetInitialLevels();
+													}
+													
+													// 确保小人有正确的年龄（如果需要）
+													if (restoredPawn.ageTracker != null && restoredPawn.ageTracker.AgeBiologicalYears <= 0)
+													{
+														restoredPawn.ageTracker.AgeBiologicalTicks = (long)(restoredPawn.RaceProps.lifeExpectancy * 0.1f * 3600000f);
+													}
+													
+													Log.Message($"[Gravship] 成功将休眠舱内小人设置为玩家阵营: {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName}");
+												}
+												else
+												{
+													Log.Message($"[Gravship] 休眠舱内小人 {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName} 已经是玩家阵营");
+												}
+											}
+											catch (Exception pawnFactionEx)
+											{
+												Log.Error($"[Gravship] 设置休眠舱内小人阵营失败: {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName} - {pawnFactionEx.Message}");
+											}
+										}
+										else
+										{
+											Log.Message($"[Gravship] 恢复后休眠舱内物品: {restoredThing.def.defName}");
+										}
+									}
+								}
+								else
+								{
+									Log.Message($"[Gravship] 中身復元成功: {thing.LabelCap}");
+								}
 							}
 							catch (Exception exposeEx)
 							{
