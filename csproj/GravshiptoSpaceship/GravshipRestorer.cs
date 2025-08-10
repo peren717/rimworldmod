@@ -793,6 +793,31 @@ public class GravshipRestorer : GameComponent
 							try
 							{
 								thingOwner.ExposeData();
+								
+								// 在FinalizeLoading之前完全重置皇室地位数据
+								if (isCryptosleepCasket && thingOwner.Count > 0)
+								{
+									foreach (Thing innerThing in thingOwner)
+									{
+										if (innerThing is Pawn innerPawn && innerPawn.royalty != null)
+										{
+											try
+											{
+												Log.Message($"[Gravship] 序列化前重置小人 {innerPawn.Name?.ToStringFull ?? innerPawn.def.defName} 的皇室地位");
+												
+												// 完全重置皇室追踪器，避免序列化问题
+												innerPawn.royalty = new Pawn_RoyaltyTracker(innerPawn);
+												
+												Log.Message($"[Gravship] 已为小人创建全新的皇室追踪器");
+											}
+											catch (Exception cleanupEx)
+											{
+												Log.Warning($"[Gravship] 重置皇室地位数据时出现警告: {innerPawn.Name?.ToStringFull ?? innerPawn.def.defName} - {cleanupEx.Message}");
+											}
+										}
+									}
+								}
+								
 								Scribe.loader.FinalizeLoading();
 								
 								if (isCryptosleepCasket)
@@ -806,9 +831,126 @@ public class GravshipRestorer : GameComponent
 											
 											try
 											{
+												// 确保小人的基本组件都已正确初始化
+												try
+												{
+													// 调用PostMake确保基本组件初始化
+													if (restoredPawn.def != null && restoredPawn.kindDef != null)
+													{
+														// 确保所有必要的组件都存在
+														PawnComponentsUtility.CreateInitialComponents(restoredPawn);
+														
+														// 确保工作设置正确初始化
+														if (restoredPawn.workSettings != null)
+														{
+															restoredPawn.workSettings.EnableAndInitializeIfNotAlreadyInitialized();
+														}
+														
+														Log.Message($"[Gravship] 小人组件初始化完成: {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName}");
+													}
+												}
+												catch (Exception initEx)
+												{
+													Log.Warning($"[Gravship] 小人组件初始化警告: {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName} - {initEx.Message}");
+												}
+												
 												if (restoredPawn.Faction != Faction.OfPlayer)
 												{
 													Log.Message($"[Gravship] 将休眠舱内小人 {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName} 设置为玩家阵营");
+													
+													// 完全重置小人的皇室地位，移除所有头衔和好感度
+													if (restoredPawn.royalty != null)
+													{
+														try
+														{
+															Log.Message($"[Gravship] 开始完全重置小人 {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName} 的皇室地位");
+															
+															var royaltyTracker = restoredPawn.royalty;
+															
+															// 1. 移除所有皇室头衔
+															if (royaltyTracker.AllTitlesForReading != null)
+															{
+																var allTitles = royaltyTracker.AllTitlesForReading.ToList();
+																foreach (var title in allTitles)
+																{
+																	if (title.faction != null)
+																	{
+																		royaltyTracker.SetTitle(title.faction, null, false, false, false);
+																		Log.Message($"[Gravship] 移除头衔: {title.def?.defName ?? "Unknown"} from {title.faction.Name}");
+																	}
+																}
+															}
+															
+															// 2. 完全清空好感度字典
+															var favorField = typeof(Pawn_RoyaltyTracker).GetField("favor", 
+																System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+															
+															if (favorField != null)
+															{
+																var favorDict = favorField.GetValue(royaltyTracker) as Dictionary<Faction, int>;
+																if (favorDict != null)
+																{
+																	favorDict.Clear();
+																	Log.Message($"[Gravship] 已清空所有好感度数据");
+																}
+															}
+															
+															// 3. 清空许可证
+															var permitsField = typeof(Pawn_RoyaltyTracker).GetField("permits", 
+																System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+															
+															if (permitsField != null)
+															{
+																var permitsList = permitsField.GetValue(royaltyTracker) as List<FactionPermit>;
+																if (permitsList != null)
+																{
+																	permitsList.Clear();
+																	Log.Message($"[Gravship] 已清空所有许可证");
+																}
+															}
+															
+															// 4. 清空债务
+															var heirField = typeof(Pawn_RoyaltyTracker).GetField("heir", 
+																System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+															
+															if (heirField != null)
+															{
+																heirField.SetValue(royaltyTracker, null);
+															}
+															
+															// 5. 重新初始化皇室追踪器
+															try
+															{
+																// 调用ExposeData来确保内部状态一致
+																var tempMode = Scribe.mode;
+																Scribe.mode = LoadSaveMode.Inactive;
+																// 不调用ExposeData，因为可能导致问题
+																Scribe.mode = tempMode;
+															}
+															catch (Exception exposeEx)
+															{
+																Log.Warning($"[Gravship] 重新初始化皇室追踪器时出现警告: {exposeEx.Message}");
+															}
+															
+															Log.Message($"[Gravship] 已完全重置小人 {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName} 的皇室地位");
+														}
+														catch (Exception royaltyEx)
+														{
+															Log.Warning($"[Gravship] 重置皇室地位时出现警告: {restoredPawn.Name?.ToStringFull ?? restoredPawn.def.defName} - {royaltyEx.Message}");
+															
+															// 如果重置失败，尝试创建新的皇室追踪器
+															try
+															{
+																restoredPawn.royalty = new Pawn_RoyaltyTracker(restoredPawn);
+																Log.Message($"[Gravship] 已为小人创建新的皇室追踪器");
+															}
+															catch (Exception newTrackerEx)
+															{
+																Log.Error($"[Gravship] 创建新皇室追踪器失败: {newTrackerEx.Message}");
+															}
+														}
+													}
+													
 													restoredPawn.SetFactionDirect(Faction.OfPlayer);
 													
 													// 确保小人有正确的基本设置
