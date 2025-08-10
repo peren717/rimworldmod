@@ -11,7 +11,6 @@
 - 🛸 **Gravship Conversion**: Transform gravships into complete spaceships for space travel
 - 🎮 **New Game Plus Scenario**: Special "Gravship New Game+" starting scenario with solo drop pod start
 - 💾 **Save & Restore**: Save and restore gravship configurations between games
-- 🌌 **Orbital Scenarios**: Custom map generation for orbital and space scenarios
 
 ## Installation
 
