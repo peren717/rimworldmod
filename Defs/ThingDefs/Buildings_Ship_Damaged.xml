@@ -44,10 +44,6 @@
     </costList>
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
     <constructionSkillPrerequisite>1</constructionSkillPrerequisite>
-    <minifiedDef>MinifiedThing</minifiedDef>
-    <thingCategories>
-      <li>BuildingsSpecial</li>
-    </thingCategories>
   </ThingDef>
 
 </Defs>
