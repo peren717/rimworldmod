@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+  <!-- 损坏的飞船反应堆翻译 -->
+  <Ship_Reactor_Damaged_Gravship.label>损坏的飞船反应堆</Ship_Reactor_Damaged_Gravship.label>
+  <Ship_Reactor_Damaged_Gravship.description>从坠毁的重力船中回收的严重损坏的飞船反应堆。核心系统已经完全烧毁，无法修复。这个反应堆纯粹是装饰性的，无法为飞船启动提供动力。你需要建造一个新的反应堆才能逃离这个世界。</Ship_Reactor_Damaged_Gravship.description>
+
+</LanguageData>

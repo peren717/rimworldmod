@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- 损坏的飞船反应堆 - 用于重力船恢复时替换真正的反应堆 -->
+  <ThingDef ParentName="BuildingBase">
+    <defName>Ship_Reactor_Damaged_Gravship</defName>
+    <label>damaged ship reactor</label>
+    <description>A heavily damaged ship reactor recovered from a crashed gravship. The core systems are completely fried and cannot be repaired. This reactor is purely decorative and cannot power a ship launch. You'll need to build a new reactor to escape this world.</description>
+    <thingClass>Building</thingClass>
+    <drawerType>MapMeshAndRealTime</drawerType>
+    <graphicData>
+      <texPath>Things/Building/Ship/ShipReactor</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(8,8)</drawSize>
+      <shadowData>
+        <volume>(5.94, 1.0, 6.71)</volume>
+      </shadowData>
+      <damageData>
+        <cornerTL>Damage/Corner</cornerTL>
+        <cornerTR>Damage/Corner</cornerTR>
+        <cornerBL>Damage/Corner</cornerBL>
+        <cornerBR>Damage/Corner</cornerBR>
+      </damageData>
+    </graphicData>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <fillPercent>1</fillPercent>
+    <canOverlapZones>false</canOverlapZones>
+    <statBases>
+      <WorkToBuild>1000</WorkToBuild>
+      <MaxHitPoints>50</MaxHitPoints>
+      <Flammability>0.8</Flammability>
+    </statBases>
+    <tickerType>Never</tickerType>
+    <size>(6,7)</size>
+    <designationCategory>Ship</designationCategory>
+    <building>
+      <shipPart>false</shipPart>
+      <destroySound>BuildingDestroyed_Metal_Big</destroySound>
+    </building>
+    <costList>
+      <Steel>50</Steel>
+      <ComponentIndustrial>2</ComponentIndustrial>
+    </costList>
+    <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+    <constructionSkillPrerequisite>1</constructionSkillPrerequisite>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsSpecial</li>
+    </thingCategories>
+  </ThingDef>
+
+</Defs>

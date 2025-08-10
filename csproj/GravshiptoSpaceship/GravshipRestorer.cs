@@ -622,15 +622,56 @@ public class GravshipRestorer : GameComponent
 						thing.SetFactionDirect(Faction.OfPlayer);
 					}
 					
-					// 安全にスポーン
-					try
+					// 检查是否为飞船反应堆，如果是则替换为假的损坏版本
+					if (thing2.defName == "Ship_Reactor")
 					{
-						GenSpawn.Spawn(thing, loc, map, rot);
+						Log.Message($"[Gravship] 检测到飞船反应堆，将替换为损坏版本: {loc}");
+						
+						// 销毁原来的真正反应堆
+						thing.Destroy();
+						
+						// 创建假的损坏飞船反应堆
+						Thing damagedReactor = CreateDamagedShipReactor();
+						if (damagedReactor != null)
+						{
+							try
+							{
+								GenSpawn.Spawn(damagedReactor, loc, map, rot);
+								Log.Message($"[Gravship] 成功生成损坏的飞船反应堆: {loc}");
+								
+								// 设置为玩家阵营
+								if (damagedReactor.def.CanHaveFaction && Faction.OfPlayer != null)
+								{
+									damagedReactor.SetFactionDirect(Faction.OfPlayer);
+								}
+								
+								// 跳过原来的thing，使用新的damagedReactor
+								thing = damagedReactor;
+							}
+							catch (Exception spawnEx)
+							{
+								Log.Error($"[Gravship] 损坏飞船反应堆生成失败: {loc} - {spawnEx.Message}");
+								continue;
+							}
+						}
+						else
+						{
+							Log.Error("[Gravship] 无法创建损坏的飞船反应堆，跳过此建筑");
+							continue;
+						}
 					}
-					catch (Exception spawnEx)
+					else
 					{
-						Log.Error($"[Gravship] スポーン失敗: {thing2.defName} at {loc} - {spawnEx.Message}");
-						continue;
+						// 安全にスポーン
+						try
+						{
+							GenSpawn.Spawn(thing, loc, map, rot);
+						}
+						catch (Exception spawnEx)
+						{
+							Log.Error($"[Gravship] スポーン失敗: {thing2.defName} at {loc} - {spawnEx.Message}");
+							continue;
+						}
 					}
 					if (thing2.extraData != null)
 					{
@@ -986,5 +1027,44 @@ public class GravshipRestorer : GameComponent
 		}
 
 		Log.Message($"[Gravship] 强力清除了 {unfoggedCount} 个格子的战争迷雾，处理了 {gravshipBuildings.Count} 个重力船建筑");
+	}
+
+	/// <summary>
+	/// 创建一个损坏的飞船反应堆，使用XML定义的ThingDef
+	/// </summary>
+	private Thing CreateDamagedShipReactor()
+	{
+		try
+		{
+			// 获取XML定义的损坏飞船反应堆
+			ThingDef damagedReactorDef = DefDatabase<ThingDef>.GetNamedSilentFail("Ship_Reactor_Damaged_Gravship");
+			if (damagedReactorDef == null)
+			{
+				Log.Error("[Gravship] 无法找到损坏飞船反应堆定义: Ship_Reactor_Damaged_Gravship");
+				return null;
+			}
+			
+			// 创建Thing实例
+			Thing damagedReactor = ThingMaker.MakeThing(damagedReactorDef, null);
+			if (damagedReactor == null)
+			{
+				Log.Error("[Gravship] 无法创建损坏的飞船反应堆实例");
+				return null;
+			}
+			
+			// 设置损坏状态（降低生命值表示严重损坏）
+			if (damagedReactor.HitPoints > 10)
+			{
+				damagedReactor.HitPoints = Math.Max(10, damagedReactor.MaxHitPoints / 5); // 设置为最大生命值的1/5
+			}
+			
+			Log.Message($"[Gravship] 成功创建损坏的飞船反应堆，生命值: {damagedReactor.HitPoints}/{damagedReactor.MaxHitPoints}");
+			return damagedReactor;
+		}
+		catch (Exception ex)
+		{
+			Log.Error($"[Gravship] 创建损坏飞船反应堆时发生错误: {ex.Message}\n{ex.StackTrace}");
+			return null;
+		}
 	}
 }
